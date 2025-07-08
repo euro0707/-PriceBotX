@@ -1,0 +1,15 @@
+{
+  "name": "pricebotx",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Amazon price monitoring bot (MVP)",
+  "main": "core/judgePrice.js",
+  "scripts": {
+    "fetch": "node core/fetchPrice.js",
+    "judge": "node core/judgePrice.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.4.5"
+  }
+}

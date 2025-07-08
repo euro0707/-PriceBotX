@@ -1,0 +1,5 @@
+# Ignore real environment secrets but keep example file
+env/.env
+!env/.env.example
+logs/
+node_modules/
