@@ -19,7 +19,10 @@ async function fetchPrice() {
   const { data } = await axios.get(url);
   if (!data || !data.products || data.products.length === 0) throw new Error('No product data');
   const product = data.products[0];
-  const latestPrice = product.buyBoxSellerHistory?.at(-1) ?? null;
+  // Keepa の buyBoxSellerHistory は価格配列（1 単位 = 5 分間隔）なので末尾が最新値
+  const latestPrice = Array.isArray(product.buyBoxSellerHistory)
+    ? product.buyBoxSellerHistory.at(-1)
+    : null;
   const ts = Date.now();
   const logEntry = { ts, price: latestPrice, asin: ASIN };
   await appendLog(logEntry);
