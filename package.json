@@ -6,10 +6,12 @@
   "main": "core/judgePrice.js",
   "scripts": {
     "fetch": "node core/fetchPrice.js",
-    "judge": "node core/judgePrice.js"
+    "judge": "node core/judgePrice.js",
+    "tweet": "node tweet/generateTweet.js"
   },
   "dependencies": {
     "axios": "^1.6.2",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "openai": "^4.10.0"
   }
 }
