@@ -2,14 +2,12 @@ import fs from 'fs/promises';
 import path from 'path';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
+import '../config/loadEnv.js';
 import { fetchPrice } from './fetchPrice.js';
 
 // __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.resolve(__dirname, '../env/.env') });
 
 const ASIN_LIST_FILE = path.resolve(__dirname, '../asin-list.json');
 const PRICE_LOG_FILE = path.resolve(__dirname, '../logs/price-log.json');

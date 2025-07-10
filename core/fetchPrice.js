@@ -1,9 +1,7 @@
 import axios from 'axios';
 import fs from 'fs/promises';
 import path from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config({ path: path.resolve('env/.env') });
+import '../config/loadEnv.js';
 
 const { KEEPA_API_KEY } = process.env;
 
