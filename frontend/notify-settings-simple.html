@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>通知設定 | PriceBotX</title>
+  <style>
+    body{margin:0;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',sans-serif;background:#f5f7fa;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem;}
+    .card{width:100%;max-width:380px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.05);padding:1.5rem;box-sizing:border-box;}
+    h1{font-size:1.4rem;text-align:center;margin:0 0 1rem;}
+    .form-group{margin-bottom:1rem;}
+    label{font-weight:600;display:block;margin-bottom:.4rem;}
+    input[type="text"],input[type="number"]{width:100%;padding:.6rem;border:1px solid #cfd8dc;border-radius:4px;font-size:1rem;box-sizing:border-box;}
+    .radio-row{display:flex;gap:1rem;}
+    .hint{font-size:.8rem;color:#607d8b;margin-top:.2rem;}
+    .toggle{position:relative;width:46px;height:24px;display:inline-block;}
+    .toggle input{opacity:0;width:0;height:0;}
+    .slider{position:absolute;inset:0;background:#ccc;border-radius:24px;transition:.3s;cursor:pointer;}
+    .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;}
+    input:checked+ .slider{background:#4caf50;}
+    input:checked+ .slider:before{transform:translateX(22px);} 
+    button{width:100%;padding:.8rem;font-size:1rem;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+    button:disabled{opacity:.6;cursor:default;}
+    .msg{font-size:.9rem;text-align:center;margin-top:.5rem;}
+    .error{color:#e53935;}
+    .success{color:#4caf50;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>通知設定</h1>
+    <form id="form" novalidate>
+      <div class="form-group">
+        <label>通知方法</label>
+        <div class="radio-row">
+          <label><input type="radio" name="method" value="line" checked> LINE</label>
+          <label><input type="radio" name="method" value="email"> メール通知</label>
+        </div>
+      </div>
+      <div id="lineBox" class="form-group">
+        <label for="lineToken">LINEトークン</label>
+        <input type="text" id="lineToken" placeholder="例）abcd1234...">
+        <div class="hint">※ LINE Notifyで発行した「アクセストークン」を入力してください。<br>発行はこちら：<a href="https://notify-bot.line.me/my/" target="_blank">notify-bot.line.me/my/</a></div>
+      </div>
+      <div id="emailBox" class="form-group" style="display:none">
+        <label for="email">通知先メールアドレス</label>
+        <input type="text" id="email" placeholder="例）example@gmail.com">
+      </div>
+      <div class="form-group">
+        <label for="price">希望価格</label>
+        <input type="number" id="price" placeholder="例）3000（円）" min="1">
+      </div>
+      <div class="form-group">
+        <label>通知ON/OFF</label>
+        <label class="toggle"><input type="checkbox" id="enabled" checked><span class="slider"></span></label>
+      </div>
+      <div id="msg" class="msg error"></div>
+      <button type="submit">保存</button>
+      <div id="success" class="msg success"></div>
+    </form>
+  </div>
+  <script>
+    const form=document.getElementById('form');
+    const lineBox=document.getElementById('lineBox');
+    const emailBox=document.getElementById('emailBox');
+    const msg=document.getElementById('msg');
+    const success=document.getElementById('success');
+
+    function toggleFields(){
+      const method=form.method.value;
+      lineBox.style.display=method==='line'?'block':'none';
+      emailBox.style.display=method==='email'?'block':'none';
+    }
+    form.method.forEach(r=>r.addEventListener('change',toggleFields));
+    toggleFields();
+
+    function validate(){
+      msg.textContent='';
+      const method=form.method.value;
+      const price=form.price.value.trim();
+      if(!price||parseFloat(price)<=0){msg.textContent='希望価格を入力してください';return false;}
+      if(method==='line'){
+        const token=form.lineToken.value.trim();
+        if(!token){msg.textContent='LINEトークンを入力してください';return false;}
+      }else{
+        const email=form.email.value.trim();
+        const re=/^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        if(!re.test(email)){msg.textContent='有効なメールアドレスを入力してください';return false;}
+      }
+      return true;
+    }
+
+    form.addEventListener('submit',e=>{
+      e.preventDefault();
+      if(!validate())return;
+      const data={
+        method:form.method.value,
+        line_token:form.lineToken.value.trim(),
+        email:form.email.value.trim(),
+        target_price:Number(form.price.value),
+        notify_enabled:document.getElementById('enabled').checked
+      };
+      localStorage.setItem('pricebotx_notify',JSON.stringify(data));
+      success.textContent='設定を保存しました';
+      msg.textContent='';
+      setTimeout(()=>success.textContent='',3000);
+    });
+  </script>
+</body>
+</html>
