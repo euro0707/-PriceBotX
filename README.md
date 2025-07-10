@@ -26,6 +26,10 @@ cp env/.env.example env/.env         # Windows PowerShell: copy env/.env.example
 
 ## 3. 使い方
 ```bash
+# 1 コマンドで取得→判定まで実行
+npm run runAll
+
+# 個別に実行したい場合
 npm run fetch   # 最新価格を取得し logs/price-log.json に追記
 npm run judge   # 直近価格と PRICE_THRESHOLD を比較して判定
 ```
