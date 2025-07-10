@@ -37,6 +37,14 @@ npm run judge   # 直近価格と PRICE_THRESHOLD を比較して判定
 - `PRICE_DROP_TRIGGER:` が出力されれば通知条件クリア（今後 Webhook を呼び出す予定）。
 - `NO_TRIGGER:` はしきい値を超過し通知不要。
 
+### npm スクリプト一覧（初心者向け）
+| コマンド | 目的 |
+| -------- | ---- |
+| `npm run fetch` | Keepa API から最新価格を取得し `logs/price-log.json` に追記 |
+| `npm run judge` | 直近価格と設定しきい値を比較し、条件を満たせば通知（Zapier Webhook 等） |
+| `npm run runAll` | `fetch` → `judge` を連続実行。これ 1 つで OK |
+| `npm run tweet` | OpenAI API で価格通知用ツイート文を生成（任意） |
+
 ## 4. ディレクトリ構成
 ```
 PriceBotX/
