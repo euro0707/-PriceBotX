@@ -14,7 +14,8 @@ const __dirname = path.dirname(__filename);
 async function main() {
   const asinList = JSON.parse(await fs.readFile(ASIN_LIST_PATH, 'utf8'));
 
-  for (const { asin, title, threshold } of asinList) {
+  for (const { asin, title, desiredPrice, threshold: legacyThreshold } of asinList) {
+    const threshold = desiredPrice ?? legacyThreshold;
     let entry;
     try {
       entry = await fetchPrice(asin); // { asin, price, timestamp }
@@ -25,10 +26,10 @@ async function main() {
 
     await appendLog({ ...entry, title });
 
-    if (isTrigger(entry.price, threshold)) {
+    if (threshold !== undefined && isTrigger(entry.price, threshold)) {
       console.log(`PRICE_DROP_TRIGGER: ${title} (${entry.price} <= ${threshold})`);
-      await notifyAll({ asin, title, price: entry.price, timestamp: entry.timestamp });
-    } else {
+      await notifyAll({ asin, title, price: entry.price, timestamp: entry.timestamp, threshold });
+    } else if (threshold !== undefined) {
       console.log(`NO_TRIGGER: ${title} (${entry.price} > ${threshold})`);
     }
   }
