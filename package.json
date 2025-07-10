@@ -7,6 +7,7 @@
   "scripts": {
     "fetch": "node core/fetchPrice.js",
     "judge": "node core/judgePrice.v2.js",
+    "runAll": "npm run fetch && npm run judge",
     "tweet": "node tweet/generateTweet.js"
   },
   "dependencies": {
