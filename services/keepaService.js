@@ -41,3 +41,25 @@ export async function fetchPrice(asin) {
   const price = typeof priceCents === 'number' && priceCents > 0 ? Math.round(priceCents / 100) : null;
   return { asin, price, timestamp: new Date().toISOString() };
 }
+
+/**
+ * Fetch product details for an ASIN.
+ * Returns { asin, title, imageUrl, currentPrice }
+ * currentPrice is in JPY (integer) or null.
+ * @param {string} asin
+ */
+export async function fetchProduct(asin) {
+  if (!KEEPA_API_KEY) throw new Error('KEEPA_API_KEY is not set');
+  const url = `${BASE_URL}?key=${KEEPA_API_KEY}&domain=${KEEP_DOMAIN}&asin=${asin}`;
+  const data = await fetchWithRetry(url);
+  const product = data.products?.[0];
+  if (!product) return null;
+
+  const currentCents = product.stats?.current?.price ?? null;
+  return {
+    asin,
+    title: product.title ?? null,
+    imageUrl: product.imagesCSV?.split(',')[0] ?? null,
+    currentPrice: typeof currentCents === 'number' && currentCents > 0 ? Math.round(currentCents / 100) : null,
+  };
+}
