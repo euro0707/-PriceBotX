@@ -42,28 +42,20 @@
 </div>
 
 <script>
-async function fetchProductInfo() {
+function fetchMockProduct() {
   const asin = document.getElementById('asin').value.trim();
   if (!asin) return alert('ASINを入力してください');
 
-  try {
-    const res = await fetch(`/api/product?asin=${encodeURIComponent(asin)}`);
-    if (!res.ok) throw new Error('API error');
-    const product = await res.json();
+  // モック商品（本番は fetch() に置き換え）
+  const product = {
+    title: 'ロジクール MX Master 3S',
+    imageUrl: 'https://example.com/mx-master.jpg',
+    currentPrice: 7980,
+  };
 
-    // fallback mock if no title returned
-    if (!product || !product.title) throw new Error('invalid data');
-    renderProduct(product);
-  } catch (err) {
-    console.warn('use mock product due to error:', err.message);
-    const product = {
-      title: 'ロジクール MX Master 3S',
-      imageUrl: 'https://example.com/mx-master.jpg',
-      currentPrice: 7980,
-    };
-    renderProduct(product);
-  }
+  renderProduct(product);
 }
+
 
 function renderProduct(p) {
   document.getElementById('product-title').innerText = p.title;
@@ -72,7 +64,10 @@ function renderProduct(p) {
   document.getElementById('product-info').style.display = 'block';
 }
 
-document.getElementById('fetch-btn').addEventListener('click', fetchProductInfo);
+window.onload = function () {
+  const btn = document.getElementById('fetch-btn');
+  if (btn) btn.addEventListener('click', fetchMockProduct);
+};
 
 function saveSettings() {
   const email = document.getElementById("email").value;
