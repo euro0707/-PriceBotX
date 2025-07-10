@@ -6,7 +6,7 @@ import '../config/loadEnv.js';
 import { ASIN_LIST_PATH } from '../utils/config.js';
 import { fetchPrice } from '../services/keepaService.js';
 import { appendLog } from '../services/logService.js';
-import { isTrigger, notifyZapier } from '../services/judgeService.js';
+import { isTrigger, notifyAll } from '../services/judgeService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,7 +27,7 @@ async function main() {
 
     if (isTrigger(entry.price, threshold)) {
       console.log(`PRICE_DROP_TRIGGER: ${title} (${entry.price} <= ${threshold})`);
-      await notifyZapier({ asin, title, price: entry.price, timestamp: entry.timestamp });
+      await notifyAll({ asin, title, price: entry.price, timestamp: entry.timestamp });
     } else {
       console.log(`NO_TRIGGER: ${title} (${entry.price} > ${threshold})`);
     }
