@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Amazon price monitoring bot (MVP)",
-  "main": "core/judgePrice.v2.js",
+  "main": "core/main.js",
   "scripts": {
-    "fetch": "node core/fetchPrice.js",
-    "judge": "node core/judgePrice.v2.js",
     "runAll": "node core/main.js",
     "tweet": "node tweet/generateTweet.js"
   },
