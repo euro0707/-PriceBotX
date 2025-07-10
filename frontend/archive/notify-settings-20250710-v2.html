@@ -57,40 +57,14 @@
     document.getElementById("email-section").style.display = "block";
   });
 
-  // 通知条件チェックとLINE送信処理
+  // 通知条件チェック関数
   function checkAndNotify(data, current_price) {
     console.log("✅ 現在価格:", current_price);
     console.log("🎯 希望価格:", data.target_price);
     console.log("🔔 通知ON:", data.notify_enabled);
 
     if (data.notify_enabled && current_price <= data.target_price) {
-      console.log("📤 通知を送信します");
-
-      if (data.method === "line" && data.line_token) {
-        fetch("https://notify-api.line.me/api/notify", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${data.line_token}`,
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: new URLSearchParams({
-            message: `📢 商品価格が下がりました！\n現在価格: ¥${current_price}\n希望価格: ¥${data.target_price}`
-          })
-        })
-        .then(response => {
-          if (response.ok) {
-            alert("LINEに通知を送信しました！");
-          } else {
-            alert("LINE通知に失敗しました。トークンが正しいか確認してください。");
-          }
-        })
-        .catch(error => {
-          console.error("通知送信エラー:", error);
-          alert("通知送信中にエラーが発生しました。");
-        });
-      } else {
-        console.log("📭 メール通知は未対応（次ステップ）");
-      }
+      console.log("📤 通知を送信します！（ここにLINE or Zapier送信を実装）");
     } else {
       console.log("⏸ 通知条件を満たしていません");
     }
@@ -113,7 +87,7 @@
     console.log("📝 保存された通知設定：", data);
     alert("設定を保存しました！");
 
-    // 仮の現在価格（ここはAPIなどで後に置き換える想定）
+    // 仮の現在価格（ここは後でAPIなどから取得する想定）
     const current_price = 2800;
     checkAndNotify(data, current_price);
   });
