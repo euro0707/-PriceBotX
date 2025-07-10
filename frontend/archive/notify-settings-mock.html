@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通知設定 (モック) | PriceBotX</title>
+  <style>
+    .card {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      border-radius: 8px;
+      background: #f9f9f9;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .card input, .card button { width: 100%; margin-top: .5rem; }
+    .card label { margin-top: .8rem; display: block; }
+  </style>
+</head>
+<body>
+<!-- notify-settings-mock.html -->
+<div class="card">
+  <h2>通知設定</h2>
+
+  <!-- ASIN入力欄 -->
+  <label for="asin">商品ASIN</label>
+  <input type="text" id="asin" placeholder="例）B08XYQ6H1N" />
+
+  <!-- 商品取得ボタン -->
+  <button onclick="fetchMockProduct()">商品を取得</button>
+
+  <!-- 商品情報表示欄 -->
+  <div id="product-info" style="margin-top: 1em; display: none;">
+    <img id="product-image" src="" alt="商品画像" style="width: 100px;" />
+    <p><strong id="product-title"></strong></p>
+    <p>現在価格：<span id="product-price"></span> 円</p>
+  </div>
+
+  <!-- 通知先 -->
+  <label for="email">通知先メールアドレス</label>
+  <input type="email" id="email" placeholder="例）example@gmail.com" />
+
+  <!-- 希望価格 -->
+  <label for="target-price">希望価格</label>
+  <input type="number" id="target-price" placeholder="例）3000" />
+
+  <!-- ON/OFF -->
+  <label for="notify-toggle">通知ON/OFF</label>
+  <input type="checkbox" id="notify-toggle" checked />
+
+  <!-- 保存ボタン -->
+  <button onclick="saveSettings()">保存</button>
+</div>
+
+<script>
+  function fetchMockProduct() {
+    const asin = document.getElementById("asin").value.trim();
+    if (!asin) return alert("ASINを入力してください");
+
+    // モック商品データ（固定）
+    const product = {
+      asin,
+      title: "ロジクール MX Master 3S",
+      imageUrl: "https://example.com/mx-master.jpg",
+      currentPrice: 7980
+    };
+
+    // UIに反映
+    document.getElementById("product-title").innerText = product.title;
+    document.getElementById("product-image").src = product.imageUrl;
+    document.getElementById("product-price").innerText = product.currentPrice.toLocaleString();
+    document.getElementById("product-info").style.display = "block";
+  }
+
+  function saveSettings() {
+    const email = document.getElementById("email").value;
+    const price = document.getElementById("target-price").value;
+    const notify = document.getElementById("notify-toggle").checked;
+    const asin = document.getElementById("asin").value;
+
+    console.log("設定を保存:", { email, price, notify, asin });
+    alert("設定を保存しました（※デモ用）");
+  }
+</script>
+</body>
+</html>
