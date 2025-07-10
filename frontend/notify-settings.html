@@ -9,6 +9,18 @@
 <div style="max-width: 400px; margin: 0 auto; padding: 2rem; border-radius: 8px; background: #f9f9f9;">
   <h2>通知設定</h2>
 
+  <!-- 商品ASIN -->
+  <label>商品ASIN</label><br />
+  <input type="text" id="asin" placeholder="例）B08XYQ6H1N" style="width: 100%; padding: 8px;" />
+  <button id="fetch-btn" style="margin-top: .5rem; width: 100%; padding: 8px;">商品を取得</button>
+
+  <!-- 商品情報表示エリア -->
+  <div id="product-info" style="margin-top: 1rem; display: none;">
+    <img id="product-image" src="" alt="商品画像" style="width: 100px; margin-bottom: .5rem;" />
+    <p><strong id="product-title"></strong></p>
+    <p>現在価格：<span id="product-price"></span> 円</p>
+  </div>
+
   <label>通知先メールアドレス</label><br />
   <input type="email" id="email" placeholder="例）example@gmail.com" style="width: 100%; padding: 8px;" />
 
@@ -29,14 +41,47 @@
 </div>
 
 <script>
+async function fetchProductInfo() {
+  const asin = document.getElementById('asin').value.trim();
+  if (!asin) return alert('ASINを入力してください');
+
+  try {
+    const res = await fetch(`/api/product?asin=${encodeURIComponent(asin)}`);
+    if (!res.ok) throw new Error('API error');
+    const product = await res.json();
+
+    // fallback mock if no title returned
+    if (!product || !product.title) throw new Error('invalid data');
+    renderProduct(product);
+  } catch (err) {
+    console.warn('use mock product due to error:', err.message);
+    const product = {
+      title: 'ロジクール MX Master 3S',
+      imageUrl: 'https://example.com/mx-master.jpg',
+      currentPrice: 7980,
+    };
+    renderProduct(product);
+  }
+}
+
+function renderProduct(p) {
+  document.getElementById('product-title').innerText = p.title;
+  document.getElementById('product-image').src = p.imageUrl || '';
+  document.getElementById('product-price').innerText = p.currentPrice ? p.currentPrice.toLocaleString() : '-';
+  document.getElementById('product-info').style.display = 'block';
+}
+
+document.getElementById('fetch-btn').addEventListener('click', fetchProductInfo);
+
 function saveSettings() {
   const email = document.getElementById("email").value;
   const target_price = parseInt(document.getElementById("target_price").value, 10);
   const notify_on = document.getElementById("notify_on").checked;
 
-  const data = { method: "email", email, target_price, notify_on };
+  const asin = document.getElementById('asin').value.trim();
+  const data = { method: 'email', email, target_price, notify_on, asin };
   localStorage.setItem("notification_settings", JSON.stringify(data));
-  alert("保存しました");
+  alert('保存しました');
 
   const current_price = 2800; // 仮の現在価格（後にAPI取得に置換）
 
