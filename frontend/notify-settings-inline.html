@@ -1,0 +1,69 @@
+<!-- 通知設定フォーム -->
+<div style="max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+  <h2>通知設定</h2>
+
+  <!-- 通知方法 -->
+  <p>通知方法</p>
+  <label><input type="radio" name="notify-method" value="line" id="method-line" checked> LINE</label>
+  <label style="margin-left: 10px;"><input type="radio" name="notify-method" value="email" id="method-email"> メール通知</label>
+
+  <!-- LINEトークン -->
+  <div id="line-section" style="margin-top: 10px;">
+    <label for="line-token">LINEトークン</label>
+    <input type="text" id="line-token" placeholder="例）abcd1234..." style="width: 100%; margin-bottom: 4px;">
+    <small>※ LINE Notifyで発行した「アクセストークン」を入力してください。<br>
+    発行はこちら：<a href="https://notify-bot.line.me/my/" target="_blank">notify-bot.line.me/my/</a></small>
+  </div>
+
+  <!-- メールアドレス -->
+  <div id="email-section" style="margin-top: 10px; display: none;">
+    <label for="email-address">通知先メールアドレス</label>
+    <input type="email" id="email-address" placeholder="例）example@gmail.com" style="width: 100%;">
+  </div>
+
+  <!-- 希望価格 -->
+  <div style="margin-top: 10px;">
+    <label for="price">希望価格</label>
+    <input type="number" id="price" placeholder="例）3000（円）" style="width: 100%;">
+  </div>
+
+  <!-- 通知ON/OFF -->
+  <div style="margin-top: 10px;">
+    <label for="notify-toggle">通知ON/OFF</label><br>
+    <input type="checkbox" id="notify-toggle" checked>
+  </div>
+
+  <!-- 保存ボタン -->
+  <button id="save-button" style="margin-top: 20px; width: 100%; background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px;">保存</button>
+</div>
+
+<!-- 保存処理スクリプト -->
+<script>
+  // 通知方法に応じた入力欄の切り替え
+  document.getElementById("method-line").addEventListener("change", () => {
+    document.getElementById("line-section").style.display = "block";
+    document.getElementById("email-section").style.display = "none";
+  });
+  document.getElementById("method-email").addEventListener("change", () => {
+    document.getElementById("line-section").style.display = "none";
+    document.getElementById("email-section").style.display = "block";
+  });
+
+  // 保存ボタン処理
+  document.getElementById("save-button").addEventListener("click", function () {
+    const method = document.querySelector('input[name="notify-method"]:checked').value;
+    const targetPrice = parseInt(document.getElementById("price").value);
+    const notifyEnabled = document.getElementById("notify-toggle").checked;
+
+    const data = {
+      method: method,
+      line_token: method === "line" ? document.getElementById("line-token").value : "",
+      email: method === "email" ? document.getElementById("email-address").value : "",
+      target_price: targetPrice,
+      notify_enabled: notifyEnabled
+    };
+
+    console.log("保存された通知設定：", data);
+    alert("設定を保存しました！");
+  });
+</script>
