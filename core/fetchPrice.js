@@ -79,6 +79,18 @@ async function appendLog(entry) {
   data[asin].push({ price, timestamp: new Date(ts).toISOString() });
 
   await fs.writeFile(PRICE_LOG, JSON.stringify(data, null, 2));
+
+  // also store daily log (YYYY-MM-DD.json)
+  const today = new Date().toISOString().slice(0, 10);
+  const dailyPath = path.join(path.dirname(PRICE_LOG), `${today}.json`);
+  let dailyArr = [];
+  try {
+    dailyArr = JSON.parse(await fs.readFile(dailyPath, 'utf8'));
+    if (!Array.isArray(dailyArr)) dailyArr = [];
+  } catch {}
+  dailyArr.push({ asin, price, timestamp: new Date(ts).toISOString() });
+  await fs.writeFile(dailyPath, JSON.stringify(dailyArr, null, 2));
+  console.log(`🗂 日別ログも保存: ${dailyPath}`);
 }
 
 
