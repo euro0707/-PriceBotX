@@ -15,9 +15,10 @@
   <button id="fetch-btn" style="margin-top: .5rem; width: 100%; padding: 8px;">商品を取得</button>
 
   <!-- 商品情報表示エリア -->
-  <div id="product-info" style="margin-top: 1rem; display: none;">
-    <img id="product-image" src="" alt="商品画像" style="width: 100px; margin-bottom: .5rem;" />
-    <p><strong id="product-title"></strong></p>
+  <!-- 商品情報表示エリア（初期は非表示） -->
+  <div id="product-info" style="display: none; margin-top: 1em; border: 1px solid #ccc; padding: 1em; border-radius: 8px;">
+    <img id="product-image" src="" alt="商品画像" style="width: 100px; display: block; margin-bottom: 0.5em;" />
+    <p><strong id="product-title">商品名</strong></p>
     <p>現在価格：<span id="product-price"></span> 円</p>
   </div>
 
