@@ -3,120 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>通知設定 (メール専用) | PriceBotX</title>
+  <title>通知設定（デモ） | PriceBotX</title>
+  <style>
+    body{font-family:sans-serif;background:#fafafa}
+    .container{max-width:420px;margin:40px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+    input,button{box-sizing:border-box;margin-top:4px;padding:8px;width:100%}
+    label{margin-top:12px;display:block;font-weight:600}
+    button{background:#4CAF50;color:#fff;border:none;border-radius:4px;cursor:pointer}
+    button:hover{opacity:.9}
+    .switch{position:relative;display:inline-block;width:50px;height:24px}
+    .switch input{opacity:0;width:0;height:0}
+    .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:24px}
+    .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:#fff;transition:.4s;border-radius:50%}
+    input:checked+ .slider{background:#4CAF50}
+    input:checked+ .slider:before{transform:translateX(26px)}
+    #previewBox{margin:10px 0;display:none}
+    #previewBox img{max-width:100%;border:1px solid #ccc;border-radius:6px}
+  </style>
 </head>
 <body>
-<div style="max-width: 400px; margin: 0 auto; padding: 2rem; border-radius: 8px; background: #f9f9f9;">
-  <h2>通知設定</h2>
+  <div class="container">
+    <h2>通知設定（デモ）</h2>
 
-  <!-- 商品ASIN -->
-  <label>商品ASIN</label><br />
-  <input type="text" id="asin" placeholder="例）B08XYQ6H1N" style="width: 100%; padding: 8px;" />
-  <button id="fetch-btn" style="margin-top: .5rem; width: 100%; padding: 8px;">商品を取得</button>
+    <label for="asin">商品ASIN</label>
+    <input type="text" id="asin" placeholder="例）B07YBD23TQ" />
 
-  <!-- 商品情報表示エリア -->
-  <!-- 商品情報表示エリア（初期は非表示） -->
-  <div id="product-info" style="display: none; margin-top: 1em; border: 1px solid #ccc; padding: 1em; border-radius: 8px;">
-    <img id="product-image" src="" alt="商品画像" style="width: 100px; display: block; margin-bottom: 0.5em;" />
-    <p><strong id="product-title">商品名</strong></p>
-    <p>現在価格：<span id="product-price"></span> 円</p>
-  </div>
+    <button id="fetchBtn" style="margin:8px 0;">商品を取得（仮）</button>
 
-  <label>通知先メールアドレス</label><br />
-  <input type="email" id="email" placeholder="例）example@gmail.com" style="width: 100%; padding: 8px;" />
+    <label for="title">商品名</label>
+    <input type="text" id="title" placeholder="例）ロジクール MX Master 3S" />
 
-  <div style="margin-top: 1rem;">
-    <label>希望価格</label><br />
-    <input type="number" id="target_price" placeholder="例）3000" style="width: 100%; padding: 8px;" />
-  </div>
+    <label for="imageUrl">画像URL</label>
+    <input type="text" id="imageUrl" placeholder="https://example.com/image.jpg" oninput="updateImagePreview()" />
 
-  <div style="margin-top: 1rem;">
-    <label>通知ON/OFF</label><br />
+    <div id="previewBox">
+      <img id="imagePreview" src="" alt="商品画像" />
+    </div>
+
+    <label for="currentPrice">現在価格</label>
+    <input type="text" id="currentPrice" placeholder="例）7980" />
+
+    <label for="email">通知先メールアドレス</label>
+    <input type="email" id="email" placeholder="example@gmail.com" />
+
+    <label for="targetPrice">希望価格</label>
+    <input type="text" id="targetPrice" placeholder="例）3000" />
+
+    <label for="notifyToggle">通知ON/OFF</label><br />
     <label class="switch">
-      <input type="checkbox" id="notify_on" checked />
-      <span class="slider round"></span>
+      <input type="checkbox" id="notifyToggle" checked>
+      <span class="slider"></span>
     </label>
+
+    <button id="saveBtn" style="margin-top:16px;">保存</button>
   </div>
 
-  <button onclick="saveSettings()" style="margin-top: 1.5rem; width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px;">保存</button>
-</div>
+  <script>
+    function fillMockData() {
+      document.getElementById('title').value = 'ロジクール MX Master 3S';
+      document.getElementById('imageUrl').value = 'https://example.com/mx-master.jpg';
+      document.getElementById('currentPrice').value = '7980';
+      updateImagePreview();
+    }
 
-<script>
-function fetchMockProduct() {
-  const asin = document.getElementById('asin').value.trim();
-  if (!asin) return alert('ASINを入力してください');
-
-  // モック商品（本番は fetch() に置き換え）
-  const product = {
-    title: 'ロジクール MX Master 3S',
-    imageUrl: 'https://example.com/mx-master.jpg',
-    currentPrice: 7980,
-  };
-
-  renderProduct(product);
-}
-
-
-function renderProduct(p) {
-  document.getElementById('product-title').innerText = p.title;
-  document.getElementById('product-image').src = p.imageUrl || '';
-  document.getElementById('product-price').innerText = p.currentPrice ? p.currentPrice.toLocaleString() : '-';
-  document.getElementById('product-info').style.display = 'block';
-}
-
-window.onload = function () {
-  const btn = document.getElementById('fetch-btn');
-  if (btn) btn.addEventListener('click', fetchMockProduct);
-};
-
-function saveSettings() {
-  const email = document.getElementById("email").value;
-  const target_price = parseInt(document.getElementById("target_price").value, 10);
-  const notify_on = document.getElementById("notify_on").checked;
-
-  const asin = document.getElementById('asin').value.trim();
-  const data = { method: 'email', email, target_price, notify_on, asin };
-  localStorage.setItem("notification_settings", JSON.stringify(data));
-  alert('保存しました');
-
-  const current_price = 2800; // 仮の現在価格（後にAPI取得に置換）
-
-  if (notify_on && current_price <= target_price) {
-    const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/23728288/u3chd5w/";
-    const payload = {
-      email,
-      current_price,
-      target_price,
-      message: `📢 商品価格が下がりました！\n現在価格: ¥${current_price}\n希望価格: ¥${target_price}`
-    };
-
-    fetch(zapierWebhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    })
-    .then(res => {
-      if (res.ok) {
-        alert("メール通知（Zapier）を送信しました！");
+    function updateImagePreview() {
+      const url = document.getElementById('imageUrl').value.trim();
+      const img = document.getElementById('imagePreview');
+      const box = document.getElementById('previewBox');
+      if (url) {
+        img.src = url;
+        box.style.display = 'block';
       } else {
-        alert("通知に失敗しました。Zapierの設定を確認してください。");
+        box.style.display = 'none';
       }
-    })
-    .catch(err => {
-      console.error("通知エラー:", err);
-      alert("通知送信中にエラーが発生しました。");
-    });
-  }
-}
-</script>
+    }
 
-<style>
-.switch { position: relative; display: inline-block; width: 46px; height: 24px; }
-.switch input { display: none; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 24px; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
-input:checked + .slider { background-color: #4CAF50; }
-input:checked + .slider:before { transform: translateX(22px); }
-</style>
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('fetchBtn').addEventListener('click', fillMockData);
+      document.getElementById('saveBtn').addEventListener('click', () => alert('保存（デモ）'));
+    });
+  </script>
 </body>
 </html>
