@@ -37,7 +37,18 @@ npm run runAll
 npm test
 ```
 
-- `PRICE_DROP_TRIGGER:` が出力されれば通知条件クリア（今後 Webhook を呼び出す予定）。
+### asin-list.json サンプル
+```jsonc
+[
+  {
+    "asin": "B09H1TPSFT",
+    "title": "製品タイトル",
+    "通知条件価格": 1500 // 価格がこの金額以下になったら通知します
+  }
+]
+```
+
+- `PRICE_DROP_TRIGGER:` が出力されれば通知条件クリア（Webhook 送信）。
 - `NO_TRIGGER:` はしきい値を超過し通知不要。
 
 ### npm スクリプト一覧
