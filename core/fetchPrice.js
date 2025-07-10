@@ -13,9 +13,27 @@ if (!KEEPA_API_KEY) {
 const PRICE_LOG = path.resolve('logs/price-log.json');
 const ASIN_LIST_PATH = path.resolve('asin-list.json');
 
+// ----- utility constants & helpers -----
+const MAX_SIZE = 1_000_000; // 1 MB
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+async function fetchWithRetry(url, retries=3, delay=1500){
+  for(let i=0;i<=retries;i++){
+    try{
+      const { data } = await axios.get(url);
+      return data;
+    }catch(err){
+      console.warn(`Retry ${i+1}/${retries} failed: ${err.message}`);
+      if(i<retries) await sleep(delay);
+      else throw err;
+    }
+  }
+}
+
+
 export async function fetchPrice(asin) {
-  const url = `https://api.keepa.com/product?key=${KEEPA_API_KEY}&domain=jp&buybox=1&buyboxSeller=1&stats=90&buyboxType=BB&history=1&asin=${asin}`;
-  const { data } = await axios.get(url);
+    const url = `https://api.keepa.com/product?key=${KEEPA_API_KEY}&domain=jp&buybox=1&buyboxSeller=1&stats=90&buyboxType=BB&history=1&asin=${asin}`;
+  const data = await fetchWithRetry(url);
   if (!data || !data.products || data.products.length === 0) throw new Error('No product data');
   const product = data.products[0];
   // Keepa の buyBoxSellerHistory は価格配列（1 単位 = 5 分間隔）なので末尾が最新値
@@ -30,8 +48,19 @@ export async function fetchPrice(asin) {
 }
 
 async function appendLog(entry) {
-  try {
+
+  // rotate if current log >1MB
     await fs.mkdir(path.dirname(PRICE_LOG), { recursive: true });
+  const stat = await fs.stat(PRICE_LOG).catch(() => null);
+  if (stat && stat.size > MAX_SIZE) {
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const rotated = PRICE_LOG.replace('.json', `-${ts}.json`);
+    await fs.rename(PRICE_LOG, rotated);
+    console.log(`🔁 ログをローテーション: ${rotated}`);
+  }
+
+  // append entry
+  try {
     const exists = await fs.stat(PRICE_LOG).then(() => true).catch(() => false);
     const arr = exists ? JSON.parse(await fs.readFile(PRICE_LOG, 'utf8')) : [];
     arr.push(entry);
@@ -40,6 +69,8 @@ async function appendLog(entry) {
     console.error('Failed to write price log', e);
   }
 }
+
+  
 
 // If run directly via CLI, loop over asin-list.json
 if (import.meta.url === process.argv[1] || import.meta.url.endsWith('/core/fetchPrice.js')) {
