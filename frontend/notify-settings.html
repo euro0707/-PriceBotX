@@ -4,194 +4,93 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>通知設定 | PriceBotX</title>
-  <style>
-    :root {
-      --primary: #4caf50;
-      --bg: #f5f7fa;
-      --card-bg: #ffffff;
-      --border: #dde3e8;
-      --text: #333;
-    }
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
-    }
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-      padding: 1.5rem;
-    }
-    h1 {
-      font-size: 1.4rem;
-      margin: 0 0 1rem;
-      text-align: center;
-    }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    .radio-row { display: flex; gap: 1rem; }
-    .toggle {
-      position: relative;
-      width: 48px;
-      height: 24px;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background-color: #ccc;
-      border-radius: 24px;
-      transition: 0.3s;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      border-radius: 50%;
-      transition: 0.3s;
-    }
-    input:checked + .slider {
-      background-color: var(--primary);
-    }
-    input:checked + .slider:before {
-      transform: translateX(24px);
-    }
-    .error { color: #e53935; font-size: 0.85rem; }
-    .success { color: var(--primary); text-align: center; margin-top: 0.5rem; }
-    button {
-      width: 100%;
-      padding: 0.8rem;
-      font-size: 1rem;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:disabled { opacity: 0.6; cursor: default; }
-  </style>
 </head>
 <body>
-  <div class="card">
-    <h1>通知設定</h1>
+<!-- 通知設定フォーム -->
+<div style="max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+  <h2>通知設定</h2>
 
-    <form id="notifyForm" novalidate>
-      <div class="form-group">
-        <label>通知方法</label>
-        <div class="radio-row">
-          <label><input type="radio" name="method" value="line" checked /> LINE Notify</label>
-          <label><input type="radio" name="method" value="email" /> メール通知(Gmail)</label>
-        </div>
-      </div>
+  <!-- 通知方法 -->
+  <p>通知方法</p>
+  <label><input type="radio" name="notify-method" value="line" id="method-line" checked> LINE</label>
+  <label style="margin-left: 10px;"><input type="radio" name="notify-method" value="email" id="method-email"> メール通知</label>
 
-      <div id="lineField" class="form-group">
-        <label for="lineToken">LINE Notify アクセストークン</label>
-        <input type="text" id="lineToken" placeholder="例）abcd1234..." />
-        <small>※ LINE Notify で発行した「アクセストークン」を入力してください。</small>
-      </div>
-
-      <div id="emailField" class="form-group" style="display:none">
-        <label for="email">通知先メールアドレス</label>
-        <input type="text" id="email" placeholder="example@gmail.com" />
-        <small>※ Gmail アカウントのメールアドレスを入力してください。</small>
-      </div>
-
-      <div class="form-group">
-        <label for="price">希望価格</label>
-        <input type="number" id="price" placeholder="例）3000（円）" min="1" />
-      </div>
-
-      <div class="form-group">
-        <label>通知ON/OFF</label>
-        <label class="toggle">
-          <input type="checkbox" id="enabled" checked />
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="error" id="errorMsg"></div>
-      <button type="submit" id="saveBtn">保存</button>
-      <div class="success" id="successMsg"></div>
-    </form>
+  <!-- LINEトークン -->
+  <div id="line-section" style="margin-top: 10px;">
+    <label for="line-token">LINEトークン</label>
+    <input type="text" id="line-token" placeholder="例）abcd1234..." style="width: 100%; margin-bottom: 4px;">
+    <small>※ LINE Notifyで発行した「アクセストークン」を入力してください。<br>
+    発行はこちら：<a href="https://notify-bot.line.me/my/" target="_blank">notify-bot.line.me/my/</a></small>
   </div>
 
-  <script>
-    const form = document.getElementById('notifyForm');
-    const lineField = document.getElementById('lineField');
-    const emailField = document.getElementById('emailField');
-    const errorMsg = document.getElementById('errorMsg');
-    const successMsg = document.getElementById('successMsg');
+  <!-- メールアドレス -->
+  <div id="email-section" style="margin-top: 10px; display: none;">
+    <label for="email-address">通知先メールアドレス</label>
+    <input type="email" id="email-address" placeholder="例）example@gmail.com" style="width: 100%;">
+  </div>
 
-    function toggleFields() {
-      const method = form.method.value;
-      lineField.style.display = method === 'line' ? 'block' : 'none';
-      emailField.style.display = method === 'email' ? 'block' : 'none';
+  <!-- 希望価格 -->
+  <div style="margin-top: 10px;">
+    <label for="price">希望価格</label>
+    <input type="number" id="price" placeholder="例）3000（円）" style="width: 100%;">
+  </div>
+
+  <!-- 通知ON/OFF -->
+  <div style="margin-top: 10px;">
+    <label for="notify-toggle">通知ON/OFF</label><br>
+    <input type="checkbox" id="notify-toggle" checked>
+  </div>
+
+  <!-- 保存ボタン -->
+  <button id="save-button" style="margin-top: 20px; width: 100%; background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px;">保存</button>
+</div>
+
+<!-- スクリプト -->
+<script>
+  // 表示切り替え
+  document.getElementById("method-line").addEventListener("change", () => {
+    document.getElementById("line-section").style.display = "block";
+    document.getElementById("email-section").style.display = "none";
+  });
+  document.getElementById("method-email").addEventListener("change", () => {
+    document.getElementById("line-section").style.display = "none";
+    document.getElementById("email-section").style.display = "block";
+  });
+
+  // 通知条件チェック関数
+  function checkAndNotify(data, current_price) {
+    console.log("✅ 現在価格:", current_price);
+    console.log("🎯 希望価格:", data.target_price);
+    console.log("🔔 通知ON:", data.notify_enabled);
+
+    if (data.notify_enabled && current_price <= data.target_price) {
+      console.log("📤 通知を送信します！（ここにLINE or Zapier送信を実装）");
+    } else {
+      console.log("⏸ 通知条件を満たしていません");
     }
+  }
 
-    form.method.forEach(r => r.addEventListener('change', toggleFields));
-    toggleFields();
+  // 保存処理
+  document.getElementById("save-button").addEventListener("click", function () {
+    const method = document.querySelector('input[name="notify-method"]:checked').value;
+    const targetPrice = parseInt(document.getElementById("price").value);
+    const notifyEnabled = document.getElementById("notify-toggle").checked;
 
-    function validate() {
-      errorMsg.textContent = '';
-      const method = form.method.value;
-      const price = document.getElementById('price').value;
-      if (!price || price <= 0) {
-        errorMsg.textContent = '希望価格を入力してください';
-        return false;
-      }
-      if (method === 'line') {
-        const token = document.getElementById('lineToken').value.trim();
-        if (!token) {
-          errorMsg.textContent = 'LINEトークンを入力してください';
-          return false;
-        }
-      } else {
-        const email = document.getElementById('email').value.trim();
-        if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-          errorMsg.textContent = '有効なメールアドレスを入力してください';
-          return false;
-        }
-      }
-      return true;
-    }
+    const data = {
+      method: method,
+      line_token: method === "line" ? document.getElementById("line-token").value : "",
+      email: method === "email" ? document.getElementById("email-address").value : "",
+      target_price: targetPrice,
+      notify_enabled: notifyEnabled
+    };
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      if (!validate()) return;
-      const data = {
-        method: form.method.value,
-        line_token: document.getElementById('lineToken').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        target_price: Number(document.getElementById('price').value),
-        notify_enabled: document.getElementById('enabled').checked
-      };
-      localStorage.setItem('pricebotx_notify', JSON.stringify(data));
-      successMsg.textContent = '設定を保存しました';
-      setTimeout(() => successMsg.textContent = '', 3000);
-    });
-  </script>
+    console.log("📝 保存された通知設定：", data);
+    alert("設定を保存しました！");
+
+    // 仮の現在価格（ここは後でAPIなどから取得する想定）
+    const current_price = 2800;
+    checkAndNotify(data, current_price);
+  });
+</script>
 </body>
 </html>
