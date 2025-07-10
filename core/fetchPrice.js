@@ -48,27 +48,39 @@ export async function fetchPrice(asin) {
 }
 
 async function appendLog(entry) {
-
-  // rotate if current log >1MB
-    await fs.mkdir(path.dirname(PRICE_LOG), { recursive: true });
+  const { asin, price, ts } = entry;
+  await fs.mkdir(path.dirname(PRICE_LOG), { recursive: true });
+  // rotate if > MAX_SIZE
   const stat = await fs.stat(PRICE_LOG).catch(() => null);
   if (stat && stat.size > MAX_SIZE) {
-    const ts = new Date().toISOString().replace(/[:.]/g, '-');
-    const rotated = PRICE_LOG.replace('.json', `-${ts}.json`);
+    const rotated = PRICE_LOG.replace('.json', `-${new Date().toISOString().replace(/[:.]/g,'-')}.json`);
     await fs.rename(PRICE_LOG, rotated);
     console.log(`🔁 ログをローテーション: ${rotated}`);
   }
 
-  // append entry
+  // read existing (array or object)
+  let data;
   try {
-    const exists = await fs.stat(PRICE_LOG).then(() => true).catch(() => false);
-    const arr = exists ? JSON.parse(await fs.readFile(PRICE_LOG, 'utf8')) : [];
-    arr.push(entry);
-    await fs.writeFile(PRICE_LOG, JSON.stringify(arr, null, 2));
-  } catch (e) {
-    console.error('Failed to write price log', e);
+    data = JSON.parse(await fs.readFile(PRICE_LOG, 'utf8'));
+  } catch { data = {}; }
+
+  // migrate old array format
+  if (Array.isArray(data)) {
+    const migrated = {};
+    for (const rec of data) {
+      const a = rec.asin;
+      if (!migrated[a]) migrated[a] = [];
+      migrated[a].push({ price: rec.price, timestamp: rec.timestamp || new Date(rec.ts).toISOString() });
+    }
+    data = migrated;
   }
+
+  if (!data[asin]) data[asin] = [];
+  data[asin].push({ price, timestamp: new Date(ts).toISOString() });
+
+  await fs.writeFile(PRICE_LOG, JSON.stringify(data, null, 2));
 }
+
 
   
 
