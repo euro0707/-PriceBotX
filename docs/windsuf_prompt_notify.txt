@@ -1,0 +1,6 @@
+PriceBotX は通知チャネル (Zapier / Discord / Slack / LINE) へ価格アラートを送る機能を持ちます。以下の要件を満たすコードを生成してください。
+- Webhook URL およびトークンは環境変数から取得
+- チャネルごとに送信失敗しても他チャネルへ影響しない
+- 同一 ASIN には 6 時間のクールダウンを実装
+- LINE Notify では message パラメータのみ送信
+- 実装は Node.js ES Modules で、services/judgeService.js 内にまとめる

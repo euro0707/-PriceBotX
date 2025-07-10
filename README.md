@@ -78,11 +78,15 @@ PriceBotX/
 └── README.md          # 本ファイル
 ```
 
-## 5. 今後のロードマップ
+## 5. 参考ドキュメント
+- [作業レポート（2025-07-10）](docs/REPORT_2025-07-10.md)
+- [通知機能 要件定義書](docs/notify_spec.md)
+
+## 6. 今後のロードマップ
 1. ChatGPT API を用いた投稿文生成 (`tweet/generateTweet.js` 予定)
 2. マルチチャネル Webhook で通知（Zapier / Discord / Slack / LINE）
 3. Windsurf UI で履歴の可視化
-4. 複数 ASIN 管理・通知制御の拡張
+4. 複数 ASIN 管理・通知制御の拡張（マルチチャネル通知実装済）
 
 ---
 開発原則: YAGNI / DRY / KISS を遵守し、SELF_REVIEW.md のチェックリストで自己レビューします。
