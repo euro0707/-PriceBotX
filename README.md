@@ -5,8 +5,10 @@ Amazon 価格監視ボット（MVP）
 ## 1. 概要
 Amazon の指定 ASIN を Keepa API で定期取得し、設定価格を下回ったら通知（将来は X / Discord などへ投稿）するボットです。
 
-- 価格取得: `core/fetchPrice.js`
-- しきい値判定: `core/judgePrice.js`
+- メイン実行: `core/main.js`
+- 価格取得サービス: `services/keepaService.js`
+- ログ管理サービス: `services/logService.js`
+- 判定 & 通知サービス: `services/judgeService.js`
 - 履歴保存: `logs/price-log.json`
 - 環境変数: `env/.env`
 
@@ -19,38 +21,41 @@ npm install
 cp env/.env.example env/.env         # Windows PowerShell: copy env/.env.example env/.env
 # .env を編集して以下を入力
 # KEEPA_API_KEY=...
+# ZAPIER_WEBHOOK_URL=
+# DISCORD_WEBHOOK_URL=
+# SLACK_WEBHOOK_URL=
+# LINE_NOTIFY_TOKEN=
 # OPENAI_API_KEY=...
-# ASIN=...
-# PRICE_THRESHOLD=10000
 ```
 
 ## 3. 使い方
 ```bash
-# 1 コマンドで取得→判定まで実行
+# 取得→判定→通知までワンコマンド
 npm run runAll
 
-# 個別に実行したい場合
-npm run fetch   # 最新価格を取得し logs/price-log.json に追記
-npm run judge   # 直近価格と PRICE_THRESHOLD を比較して判定
+# ユニットテストを実行（Jest）
+npm test
 ```
 
 - `PRICE_DROP_TRIGGER:` が出力されれば通知条件クリア（今後 Webhook を呼び出す予定）。
 - `NO_TRIGGER:` はしきい値を超過し通知不要。
 
-### npm スクリプト一覧（初心者向け）
+### npm スクリプト一覧
 | コマンド | 目的 |
 | -------- | ---- |
-| `npm run fetch` | Keepa API から最新価格を取得し `logs/price-log.json` に追記 |
-| `npm run judge` | 直近価格と設定しきい値を比較し、条件を満たせば通知（Zapier Webhook 等） |
-| `npm run runAll` | `fetch` → `judge` を連続実行。これ 1 つで OK |
-| `npm run tweet` | OpenAI API で価格通知用ツイート文を生成（任意） |
+| `npm run runAll` | ASIN リストをループし、価格取得→ログ→判定→マルチチャネル通知 |
+| `npm test` | Jest でユニットテスト実行 |
+| `npm run tweet` | OpenAI でツイート文生成（任意） |
 
 ## 4. ディレクトリ構成
 ```
 PriceBotX/
 ├── core/              # 中核ロジック
-│   ├── fetchPrice.js  # Keepa API 取得
-│   └── judgePrice.js  # しきい値判定
+│   └── main.js        # 実行エントリ（ループ制御）
+├── services/          # ビジネスロジック層
+│   ├── keepaService.js  # Keepa API 取得
+│   ├── logService.js    # ログ管理
+│   └── judgeService.js  # 判定 & 通知
 ├── env/               # API キーなど（Git 除外）
 │   ├── .env           # 実キー
 │   └── .env.example   # 雛形
@@ -64,7 +69,7 @@ PriceBotX/
 
 ## 5. 今後のロードマップ
 1. ChatGPT API を用いた投稿文生成 (`tweet/generateTweet.js` 予定)
-2. Zapier Webhook で X へ投稿 / 通知
+2. マルチチャネル Webhook で通知（Zapier / Discord / Slack / LINE）
 3. Windsurf UI で履歴の可視化
 4. 複数 ASIN 管理・通知制御の拡張
 
