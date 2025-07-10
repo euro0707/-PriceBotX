@@ -7,6 +7,8 @@
   "scripts": {
     "runAll": "node core/main.js",
     "tweet": "node tweet/generateTweet.js",
+    "fetchOne": "node scripts/fetchOne.js",
+    "judgeOne": "node scripts/judgeOne.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
