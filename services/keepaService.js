@@ -49,6 +49,15 @@ export async function fetchPrice(asin) {
  * @param {string} asin
  */
 export async function fetchProduct(asin) {
+  // Return mock data when USE_MOCK=true (for UI/demo)
+  if (process.env.USE_MOCK === 'true') {
+    return {
+      asin,
+      title: 'ロジクール MX Master 3S',
+      imageUrl: 'https://example.com/mx-master.jpg',
+      currentPrice: 7980,
+    };
+  }
   if (!KEEPA_API_KEY) throw new Error('KEEPA_API_KEY is not set');
   const url = `${BASE_URL}?key=${KEEPA_API_KEY}&domain=${KEEP_DOMAIN}&asin=${asin}`;
   const data = await fetchWithRetry(url);
