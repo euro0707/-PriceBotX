@@ -1,122 +1,81 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>通知設定 | PriceBotX</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通知設定 (メール専用) | PriceBotX</title>
 </head>
 <body>
-<!-- 通知設定フォーム -->
-<div style="max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+<div style="max-width: 400px; margin: 0 auto; padding: 2rem; border-radius: 8px; background: #f9f9f9;">
   <h2>通知設定</h2>
 
-  <!-- 通知方法 -->
-  <p>通知方法</p>
-  <label><input type="radio" name="notify-method" value="line" id="method-line" checked> LINE</label>
-  <label style="margin-left: 10px;"><input type="radio" name="notify-method" value="email" id="method-email"> メール通知</label>
+  <label>通知先メールアドレス</label><br />
+  <input type="email" id="email" placeholder="例）example@gmail.com" style="width: 100%; padding: 8px;" />
 
-  <!-- LINEトークン -->
-  <div id="line-section" style="margin-top: 10px;">
-    <label for="line-token">LINEトークン</label>
-    <input type="text" id="line-token" placeholder="例）abcd1234..." style="width: 100%; margin-bottom: 4px;">
-    <small>※ LINE Notifyで発行した「アクセストークン」を入力してください。<br>
-    発行はこちら：<a href="https://notify-bot.line.me/my/" target="_blank">notify-bot.line.me/my/</a></small>
+  <div style="margin-top: 1rem;">
+    <label>希望価格</label><br />
+    <input type="number" id="target_price" placeholder="例）3000" style="width: 100%; padding: 8px;" />
   </div>
 
-  <!-- メールアドレス -->
-  <div id="email-section" style="margin-top: 10px; display: none;">
-    <label for="email-address">通知先メールアドレス</label>
-    <input type="email" id="email-address" placeholder="例）example@gmail.com" style="width: 100%;">
+  <div style="margin-top: 1rem;">
+    <label>通知ON/OFF</label><br />
+    <label class="switch">
+      <input type="checkbox" id="notify_on" checked />
+      <span class="slider round"></span>
+    </label>
   </div>
 
-  <!-- 希望価格 -->
-  <div style="margin-top: 10px;">
-    <label for="price">希望価格</label>
-    <input type="number" id="price" placeholder="例）3000（円）" style="width: 100%;">
-  </div>
-
-  <!-- 通知ON/OFF -->
-  <div style="margin-top: 10px;">
-    <label for="notify-toggle">通知ON/OFF</label><br>
-    <input type="checkbox" id="notify-toggle" checked>
-  </div>
-
-  <!-- 保存ボタン -->
-  <button id="save-button" style="margin-top: 20px; width: 100%; background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px;">保存</button>
+  <button onclick="saveSettings()" style="margin-top: 1.5rem; width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px;">保存</button>
 </div>
 
-<!-- スクリプト -->
 <script>
-  // 表示切り替え
-  document.getElementById("method-line").addEventListener("change", () => {
-    document.getElementById("line-section").style.display = "block";
-    document.getElementById("email-section").style.display = "none";
-  });
-  document.getElementById("method-email").addEventListener("change", () => {
-    document.getElementById("line-section").style.display = "none";
-    document.getElementById("email-section").style.display = "block";
-  });
+function saveSettings() {
+  const email = document.getElementById("email").value;
+  const target_price = parseInt(document.getElementById("target_price").value, 10);
+  const notify_on = document.getElementById("notify_on").checked;
 
-  // 通知条件チェックとLINE送信処理
-  function checkAndNotify(data, current_price) {
-    console.log("✅ 現在価格:", current_price);
-    console.log("🎯 希望価格:", data.target_price);
-    console.log("🔔 通知ON:", data.notify_enabled);
+  const data = { method: "email", email, target_price, notify_on };
+  localStorage.setItem("notification_settings", JSON.stringify(data));
+  alert("保存しました");
 
-    if (data.notify_enabled && current_price <= data.target_price) {
-      console.log("📤 通知を送信します");
+  const current_price = 2800; // 仮の現在価格（後にAPI取得に置換）
 
-      if (data.method === "line" && data.line_token) {
-        fetch("https://notify-api.line.me/api/notify", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${data.line_token}`,
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: new URLSearchParams({
-            message: `📢 商品価格が下がりました！\n現在価格: ¥${current_price}\n希望価格: ¥${data.target_price}`
-          })
-        })
-        .then(response => {
-          if (response.ok) {
-            alert("LINEに通知を送信しました！");
-          } else {
-            alert("LINE通知に失敗しました。トークンが正しいか確認してください。");
-          }
-        })
-        .catch(error => {
-          console.error("通知送信エラー:", error);
-          alert("通知送信中にエラーが発生しました。");
-        });
-      } else {
-        console.log("📭 メール通知は未対応（次ステップ）");
-      }
-    } else {
-      console.log("⏸ 通知条件を満たしていません");
-    }
-  }
-
-  // 保存処理
-  document.getElementById("save-button").addEventListener("click", function () {
-    const method = document.querySelector('input[name="notify-method"]:checked').value;
-    const targetPrice = parseInt(document.getElementById("price").value);
-    const notifyEnabled = document.getElementById("notify-toggle").checked;
-
-    const data = {
-      method: method,
-      line_token: method === "line" ? document.getElementById("line-token").value : "",
-      email: method === "email" ? document.getElementById("email-address").value : "",
-      target_price: targetPrice,
-      notify_enabled: notifyEnabled
+  if (notify_on && current_price <= target_price) {
+    const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/23728288/u3chd5w/";
+    const payload = {
+      email,
+      current_price,
+      target_price,
+      message: `📢 商品価格が下がりました！\n現在価格: ¥${current_price}\n希望価格: ¥${target_price}`
     };
 
-    console.log("📝 保存された通知設定：", data);
-    alert("設定を保存しました！");
-
-    // 仮の現在価格（ここはAPIなどで後に置き換える想定）
-    const current_price = 2800;
-    checkAndNotify(data, current_price);
-  });
+    fetch(zapierWebhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if (res.ok) {
+        alert("メール通知（Zapier）を送信しました！");
+      } else {
+        alert("通知に失敗しました。Zapierの設定を確認してください。");
+      }
+    })
+    .catch(err => {
+      console.error("通知エラー:", err);
+      alert("通知送信中にエラーが発生しました。");
+    });
+  }
+}
 </script>
+
+<style>
+.switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+.switch input { display: none; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: 0.4s; border-radius: 24px; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; }
+input:checked + .slider { background-color: #4CAF50; }
+input:checked + .slider:before { transform: translateX(22px); }
+</style>
 </body>
 </html>
