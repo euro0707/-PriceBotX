@@ -81,6 +81,7 @@ PriceBotX/
 ## 5. 参考ドキュメント
 - [作業レポート（2025-07-10）](docs/REPORT_2025-07-10.md)
 - [通知機能 要件定義書](docs/notify_spec.md)
+- 通知設定 UI 最新版: `frontend/notify-settings.html` (旧版は `frontend/archive/` に保管)
 
 ## 6. 今後のロードマップ
 1. ChatGPT API を用いた投稿文生成 (`tweet/generateTweet.js` 予定)
